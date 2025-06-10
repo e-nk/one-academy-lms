@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import MainLayout from '@/components/layouts/MainLayout'
 import "./globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
 
 
 // Use www version since it's your canonical domain
 const baseUrl = 'https://www.oneacademy.org/';
-const title = "ONE.org One-Academy";
+const title = "ONE.ORG One Academy";
 const description = "ONE.org One-Academy is a platform for learning and sharing knowledge about global issues and solutions.";
 
 export const metadata: Metadata = {
@@ -61,6 +62,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+		<ClerkProvider>
     <html lang="en">
       <head>
         {/* Add script to detect touch devices early */}
@@ -85,5 +87,6 @@ export default function RootLayout({
           </MainLayout>    
       </body>
     </html>
+		</ClerkProvider>
   );
 }
