@@ -1,9 +1,11 @@
 "use client"
 import { useState, useEffect } from "react"
 import { usePathname } from "next/navigation"
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "../ui/button"
+import { DarkModeToggle } from "../DarkModeToggle"
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -32,7 +34,7 @@ const Header = () => {
   }, [])
 
   const menuItems = [
-		{ name: "Home", href: "/" },
+    { name: "Home", href: "/" },
     { name: "Learn", href: "/learn" },
     // { name: "Get Involved", href: "/get-involved" },
     { name: "About", href: "/about" },
@@ -109,32 +111,52 @@ const Header = () => {
               </svg>
             </Link>
 
-            {/* Already have an account - Login */}
-            <div className="flex flex-col items-center text-center">
-              <span className={`text-xs ${getTextColorClass()} opacity-75 mb-1`}>Already have an account?</span>
-              <Link
-                href="https://online.oneacademy.org/login"
-                className={`font-bold uppercase text-sm tracking-wide ${getTextColorClass()} hover:text-one-primary-neon transition-colors underline decoration-1 underline-offset-2`}
-              >
-                Login
-              </Link>
-            </div>
+            {/* Add Dark Mode Toggle */}
+            <DarkModeToggle />
+
+            {/* Clerk Authentication */}
+            <SignedOut>
+              {/* Already have an account - Login */}
+              <div className="flex flex-col items-center text-center">
+                <span className={`text-xs ${getTextColorClass()} opacity-75 mb-1`}>Already have an account?</span>
+                <SignInButton mode="modal">
+                  <button className={`font-bold uppercase text-sm tracking-wide ${getTextColorClass()} hover:text-one-primary-neon transition-colors underline decoration-1 underline-offset-2 bg-transparent border-none cursor-pointer`}>
+                    Login
+                  </button>
+                </SignInButton>
+              </div>
+            </SignedOut>
+
+            <SignedIn>
+              <UserButton 
+                afterSignOutUrl="/"
+                appearance={{
+                  elements: {
+                    avatarBox: "h-10 w-10"
+                  }
+                }}
+              />
+            </SignedIn>
           </div>
 
           {/* Mobile Menu Controls */}
-          <div className="flex items-center lg:hidden">
-            <Button 
-              className={`p-2 ${getTextColorClass()} hover:text-one-primary-neon transition-colors`}
-              aria-label="Search"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </Button>
+          <div className="flex items-center lg:hidden space-x-2">
+            <DarkModeToggle />
+            
+            <SignedIn>
+              <UserButton 
+                afterSignOutUrl="/"
+                appearance={{
+                  elements: {
+                    avatarBox: "h-8 w-8"
+                  }
+                }}
+              />
+            </SignedIn>
 
             <Button
               type="button"
-              className={`p-2 ml-2 ${getTextColorClass()} hover:text-one-primary-neon transition-colors`}
+              className={`p-2 ${getTextColorClass()} hover:text-one-primary-neon transition-colors bg-transparent border-none`}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -193,16 +215,18 @@ const Header = () => {
               </Link>
 
               {/* Mobile Login Option */}
-              <div className="text-center mt-3 pt-3 border-t border-gray-700">
-                <span className="text-xs text-gray-400 block mb-2">Already have an account?</span>
-                <Link
-                  href="https://online.oneacademy.org/login"
-                  className="font-bold uppercase text-sm tracking-wide text-white hover:text-one-primary-neon transition-colors underline decoration-1 underline-offset-2"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Login
-                </Link>
-              </div>
+              <SignedOut>
+                <div className="text-center mt-3 pt-3 border-t border-gray-700">
+                  <span className="text-xs text-gray-400 block mb-2">Already have an account?</span>
+                  <SignInButton mode="modal">
+                    <button className="font-bold uppercase text-sm tracking-wide text-white hover:text-one-primary-neon transition-colors underline decoration-1 underline-offset-2 bg-transparent border-none cursor-pointer"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Login
+                    </button>
+                  </SignInButton>
+                </div>
+              </SignedOut>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import MainLayout from '@/components/layouts/MainLayout'
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider"
 import { ClerkProvider } from "@clerk/nextjs";
 
 
@@ -62,8 +63,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-		<ClerkProvider>
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Add script to detect touch devices early */}
         <script dangerouslySetInnerHTML={{
@@ -82,11 +82,19 @@ export default function RootLayout({
         }} />
       </head>
       <body className="font-colfax">
+				<ClerkProvider>
+ 					<ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
           <MainLayout>
             {children}
-          </MainLayout>    
+          </MainLayout>   
+					</ThemeProvider>
+					</ClerkProvider>
       </body>
     </html>
-		</ClerkProvider>
   );
 }
