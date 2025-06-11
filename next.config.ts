@@ -8,6 +8,18 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+	images:{
+		remotePatterns: [
+      {
+        hostname: "cdn.sanity.io",
+        protocol: "https",
+      },
+      {
+        hostname: "img.clerk.com",
+        protocol: "https",
+      },
+    ],
+	}
 };
 
 export default nextConfig;
