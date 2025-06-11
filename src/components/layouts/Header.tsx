@@ -6,23 +6,16 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "../ui/button"
 import { DarkModeToggle } from "../DarkModeToggle"
+import { Search } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const router = useRouter()
 
   const pathname = usePathname()
-
-  useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 1024)
-    }
-
-    checkIfMobile()
-    window.addEventListener("resize", checkIfMobile)
-    return () => window.removeEventListener("resize", checkIfMobile)
-  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,98 +26,113 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/search/${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
+
   const menuItems = [
-    { name: "Home", href: "/" },
     { name: "Learn", href: "/learn" },
-    // { name: "Get Involved", href: "/get-involved" },
     { name: "About", href: "/about" },
-    // { name: "Knowledge Hub", href: "#" },
+    { name: "ONE.ORG", href: "https://one.org/" },
   ]
 
   const getHeaderClasses = () => {
-    return isScrolled ? "bg-white py-3 shadow-md" : "bg-transparent py-5"
+    return isScrolled 
+      ? "bg-white/95 backdrop-blur-md py-3 shadow-lg border-b border-gray-100" 
+      : "bg-one-primary-black py-4"
   }
 
   const getTextColorClass = () => {
-    return isScrolled ? "text-one-primary-black" : "text-white"
+    return isScrolled 
+      ? "text-one-primary-black" 
+      : "text-one-primary-white"
   }
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${getHeaderClasses()}`}>
-      <div className="w-full px-[20px] sm:px-[30px] lg:px-[40px] xl:px-[60px] mx-auto">
-        <div className="flex items-center justify-between">
-          {/* Logo and text */}
-          <div className="flex items-center">
-            <Link href="/" className="flex-shrink-0">
-              <div className="flex items-center">
-                <div className="relative h-12 w-12 sm:h-14 sm:w-14">
-                  <div className={`absolute inset-0 transition-opacity duration-300 ${!isScrolled ? "opacity-100" : "opacity-0"}`}>
-                    <Image src="/one_logo/ONE-logo-white.png" alt="ONE" fill className="object-contain" priority />
-                  </div>
-                  <div className={`absolute inset-0 transition-opacity duration-300 ${isScrolled ? "opacity-100" : "opacity-0"}`}>
-                    <Image src="/one_logo/ONE-logo-black.png" alt="ONE" fill className="object-contain" priority />
-                  </div>
-                </div>
-                <span className={`font-bold text-xl sm:text-2xl tracking-wide ml-3 transition-colors duration-300 ${getTextColorClass()}`}>ACADEMY</span>
+      <div className="w-full mx-auto px-[20px] sm:px-[30px] lg:px-[40px] xl:px-[60px] 2xl:px-[80px]">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="relative h-10 w-10">
+              <div className={`absolute inset-0 transition-opacity duration-300 ${!isScrolled ? "opacity-100" : "opacity-0"}`}>
+                <Image 
+                  src="/one_logo/ONE-logo-white.png" 
+                  alt="ONE" 
+                  fill 
+                  className="object-contain transition-transform group-hover:scale-105" 
+                  priority 
+                />
               </div>
-            </Link>
+              <div className={`absolute inset-0 transition-opacity duration-300 ${isScrolled ? "opacity-100" : "opacity-0"}`}>
+                <Image 
+                  src="/one_logo/ONE-logo-black.png" 
+                  alt="ONE" 
+                  fill 
+                  className="object-contain transition-transform group-hover:scale-105" 
+                  priority 
+                />
+              </div>
+            </div>
+            <span className={`font-colfax font-black text-xl tracking-wider transition-colors ${getTextColorClass()} group-hover:text-one-primary-neon`}>
+              ACADEMY
+            </span>
+          </Link>
 
-            {/* Desktop Navigation - With more space between logo and menu */}
-            <nav className="hidden lg:flex space-x-8 xl:space-x-10 ml-16">
-              {menuItems.map((item) => {
-                const isActive = pathname !== "/" && pathname === item.href
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`relative font-bold uppercase text-base tracking-wide ${getTextColorClass()} hover:text-one-primary-neon transition-colors group`}
-                  >
-                    {item.name}
-                    <span
-                      className={`absolute -bottom-1 left-0 h-0.5 bg-one-primary-neon transition-all duration-300 ${
-                        isActive ? "w-full" : "w-0"
-                      } group-hover:w-full`}
-                    />
-                  </Link>
-                )
-              })}
-            </nav>
-          </div>
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-8">
+            {menuItems.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`relative font-colfax font-semibold text-sm uppercase tracking-wider transition-all duration-200 ${getTextColorClass()} hover:text-one-primary-neon group`}
+                >
+                  {item.name}
+                  <span className={`absolute -bottom-1 left-0 h-0.5 bg-one-primary-neon transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover:w-full"}`} />
+                </Link>
+              )
+            })}
+          </nav>
 
-          {/* Right side - Enroll and Login */}
+          {/* Search & Auth */}
           <div className="hidden lg:flex items-center space-x-6">
-            {/* Enroll Now Button */}
-            <Link
-              href="/learn"
-              className="group flex items-center space-x-1 px-5 py-2.5 rounded-md text-base font-medium transition-all duration-300
-                bg-one-primary-neon text-one-primary-black
-                hover:bg-one-primary-black hover:text-one-primary-neon"
-            >
-              <span className="font-bold uppercase">Enroll Now</span>
-              <svg
-                className="w-4 h-4 transition-transform group-hover:translate-x-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </Link>
+            {/* Search */}
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <input
+                type="text"
+                placeholder="Search courses..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`w-64 h-9 pl-9 pr-4 text-sm rounded-full transition-all duration-200 ${
+                  isScrolled 
+                    ? "bg-gray-50 text-gray-900 placeholder-gray-500 border border-gray-200 focus:bg-white focus:border-one-primary-teal focus:shadow-sm" 
+                    : "bg-white/10 text-white placeholder-white/70 border border-white/20 focus:bg-white/20 focus:border-white/40"
+                } focus:outline-none`}
+              />
+              <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${
+                isScrolled ? "text-gray-400" : "text-white/70"
+              }`} />
+            </form>
 
-            {/* Add Dark Mode Toggle */}
-            <DarkModeToggle />
-
-            {/* Clerk Authentication */}
+            {/* Auth */}
             <SignedOut>
-              {/* Already have an account - Login */}
-              <div className="flex flex-col items-center text-center">
-                <span className={`text-xs ${getTextColorClass()} opacity-75 mb-1`}>Already have an account?</span>
-                <SignInButton mode="modal">
-                  <button className={`font-bold uppercase text-sm tracking-wide ${getTextColorClass()} hover:text-one-primary-neon transition-colors underline decoration-1 underline-offset-2 bg-transparent border-none cursor-pointer`}>
-                    Login
-                  </button>
-                </SignInButton>
-              </div>
+              <SignInButton mode="modal">
+                <Button 
+                  variant="outline"
+                  className={`font-colfax font-semibold px-6 py-2 rounded-full border-2 transition-all duration-200 ${
+                    isScrolled
+                      ? "border-one-secondary-plum bg-one-secondary-plum text-white hover:bg-one-primary-black hover:border-one-primary-black"
+                      : "border-white text-white hover:bg-one-primary-white hover:text-one-primary-black hover:border-one-primary-white"
+                  }`}
+                >
+                  Sign In
+                </Button>
+              </SignInButton>
             </SignedOut>
 
             <SignedIn>
@@ -132,15 +140,15 @@ const Header = () => {
                 afterSignOutUrl="/"
                 appearance={{
                   elements: {
-                    avatarBox: "h-10 w-10"
+                    avatarBox: "h-9 w-9 rounded-full border-2 border-white/20"
                   }
                 }}
               />
             </SignedIn>
           </div>
 
-          {/* Mobile Menu Controls */}
-          <div className="flex items-center lg:hidden space-x-2">
+          {/* Mobile Menu Button */}
+          <div className="lg:hidden flex items-center space-x-3">
             <DarkModeToggle />
             
             <SignedIn>
@@ -155,17 +163,17 @@ const Header = () => {
             </SignedIn>
 
             <Button
-              type="button"
-              className={`p-2 ${getTextColorClass()} hover:text-one-primary-neon transition-colors bg-transparent border-none`}
+              variant="ghost"
+              size="icon"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle menu"
+              className={`${getTextColorClass()} hover:bg-white/10`}
             >
               {isMobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}
@@ -174,60 +182,48 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-one-primary-black text-white border-t border-gray-800 animate-slideDown overflow-hidden">
-          <div className="w-full px-[20px] sm:px-[30px]">
-            <div className="py-4 space-y-1 sm:space-y-2">
-              {menuItems.map((item) => {
-                const isActive = pathname !== "/" && pathname === item.href
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`block px-3 py-2.5 rounded-md text-base font-bold uppercase transition-colors
-                      hover:bg-one-primary-black hover:text-one-primary-neon
-                      ${isActive ? "text-one-primary-neon" : "text-white"}`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
-                )
-              })}
+        <div className="lg:hidden bg-one-primary-black/95 backdrop-blur-lg border-t border-white/10">
+          <div className="px-[20px] sm:px-[30px] py-4 space-y-4">
+            {/* Mobile Search */}
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <input
+                type="text"
+                placeholder="Search courses..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-10 pl-10 pr-4 text-sm bg-white/10 text-white placeholder-white/70 border border-white/20 rounded-full focus:outline-none focus:bg-white/20 focus:border-white/40"
+              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
+            </form>
 
-              {/* Mobile Enroll Now Button */}
-              <Link
-                href="/learn"
-                className="group flex items-center justify-between w-full px-4 py-3 mt-4 rounded-md text-base font-bold uppercase
-                  bg-one-primary-neon text-one-primary-black 
-                  hover:bg-one-primary-black hover:text-one-secondary-plum transition-all duration-300"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <span>Enroll Now</span>
-                <svg
-                  className="w-5 h-5 transition-transform group-hover:translate-x-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+            {/* Mobile Navigation */}
+            <nav className="space-y-2">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-4 py-3 text-white font-colfax font-semibold uppercase tracking-wider text-sm hover:text-one-primary-neon hover:bg-white/5 rounded-lg transition-all"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              </Link>
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
 
-              {/* Mobile Login Option */}
-              <SignedOut>
-                <div className="text-center mt-3 pt-3 border-t border-gray-700">
-                  <span className="text-xs text-gray-400 block mb-2">Already have an account?</span>
-                  <SignInButton mode="modal">
-                    <button className="font-bold uppercase text-sm tracking-wide text-white hover:text-one-primary-neon transition-colors underline decoration-1 underline-offset-2 bg-transparent border-none cursor-pointer"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Login
-                    </button>
-                  </SignInButton>
-                </div>
-              </SignedOut>
-            </div>
+            {/* Mobile Auth */}
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button 
+                  variant="outline"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full font-colfax font-semibold border-2 border-one-primary-white text-one-primary-white hover:bg-one-primary-white hover:text-one-primary-black rounded-full"
+                >
+                  Sign In
+                </Button>
+              </SignInButton>
+            </SignedOut>
           </div>
         </div>
       )}
